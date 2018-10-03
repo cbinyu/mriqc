@@ -392,8 +392,15 @@ def init_mriqc(opts, retval):
     # Process data types
     modalities = opts.modalities
 
+    # Get the folders/files to exclude:
+    # (use .rstrip() to remove the line return at the end of each line)
+    try:
+        bidsignore_lines = [line.rstrip() for line in open(str(settings['bids_dir']) + "/.bidsignore")]
+    except:
+        bidsignore_lines = []
+
     layout = BIDSLayout(str(settings['bids_dir']),
-                        exclude=['derivatives', 'sourcedata'])
+                        exclude=['derivatives', 'sourcedata'] + bidsignore_lines)
     dataset = collect_bids_data(
         layout,
         participant_label=opts.participant_label,
