@@ -29,10 +29,13 @@ def collect_bids_data(layout, participant_label=None, session=None, run=None,
     # Start querying
     imaging_data = defaultdict(list, {})
     for btype in bids_type:
+        # For 'T1w' modality, we only want the 'highres' images:
+        myFilter={'acq':'highres'} if btype=='T1w' else {}
         imaging_data[btype] = layout.get(
             type=btype,
             return_type='file',
             extensions=['nii', 'nii.gz'],
-            **basequery)
+            **{**basequery, **myFilter }
+            )
 
     return imaging_data
