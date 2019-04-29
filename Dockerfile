@@ -21,7 +21,13 @@ ENV ep=$poldrackmriqc_ep
 
 RUN fileToEdit=$(find `dirname $ep`/../lib/python*/site-packages/mriqc/ -name mriqc_run.py) \
     && sed -i \
-        -e "s#\( *\)layout = BIDSLayout#\1with open(str(settings['bids_dir']) + \"/.bidsignore\",'r') as f:\n\1    lines = [line.rstrip() for line in f]\n&#" \
+        -e "s#\( *\)layout = BIDSLayout#\
+\1try:\n\
+\1    with open(str(settings['bids_dir']) + \"/.bidsignore\",'r') as f:\n\
+\1        lines = [line.rstrip() for line in f]\n\
+\1except FileNotFoundError:\n\
+\1    lines = []\n\
+&#" \
         -e "s#\( *\)exclude=\[\(.\+\)\])#\1exclude=\[\2\]+lines)#" \
        $fileToEdit \
     && fileToEdit=$(dirname $ep)/../lib/python*/site-packages/mriqc/utils/bids.py \
